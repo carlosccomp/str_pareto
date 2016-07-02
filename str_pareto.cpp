@@ -74,22 +74,35 @@ void str_pareto::calculate_fitness() {
 }
 
 void str_pareto::environmental_selection() {
-    std::vector <solution> union_;
+    std::vector <solution *> union_, environment;
     union_.reserve(pop.size() + archive.size());
-    union_.insert(union_.end(), pop.begin(), pop.end());
-    union_.insert(union_.end(), archive.begin(), archive.end());
+    environment.reserve(pop.size() + archive.size());
+    for(auto it=pop.begin();it!=pop.end();it++)
+        union_.push_back(&(*it));
+    for(auto it=archive.begin();it!=archive.end();it++)
+        union_.push_back(&(*it));
 
-    for(auto it=union_.begin();it!=union_.end();it++)
-        std::cout << *it << std::endl;
+    std::sort(union_.begin(), union_.end(), [](solution *s1, solution *s2){ return (*s1).getFitness() < (*s2).getFitness(); });
 
-    std::cout << std::endl << "after selection: " << std::endl << std::endl;
+    auto it = union_.begin();
+    for(;it!=union_.end();it++) {
+        if((*it)->getFitness() >= 1.0f)
+            break;
+    }
 
-    /*std::remove_if(union_.begin(), union_.end(), [](solution &s){ return s.getFitness() >= 1.0f; });
+    for(auto a=union_.begin();a!=union_.end();a++)
+        std::cout << *(*a) << std::endl;
 
-    for(auto it=union_.begin();it!=union_.end();it++)
-        std::cout << *it << std::endl;
+    /*if(it - union_.begin() <= archive_size) {
+        // FALHA DE SEGMENTAÇÃO AQUI
+        environment.insert(union_.begin(), union_.begin() + archive_size, environment.end());
+    }
+    else {
 
-    std::cout << "end" << std::endl;*/
+    }
+
+    for(auto a=environment.begin();a!=environment.end();a++)
+        std::cout << *(*a) << std::endl;*/
 }
 
 void str_pareto::run() {
@@ -97,9 +110,9 @@ void str_pareto::run() {
     std::cin.tie(nullptr);
     std::cerr.tie(nullptr);
 
-    pop.resize(static_cast<unsigned int>(pop_size));
+    pop.resize(pop_size);
 
-    int i = 0;
+    //int i = 0;
     //while(true) {
         calculate_fitness();
         environmental_selection();

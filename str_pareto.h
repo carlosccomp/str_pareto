@@ -11,8 +11,8 @@ private:
     double search_space_min = -10;
     double search_space_max = 10;
     int max_gens = 50;
-    int pop_size = 5;
-    int archive_size = 40;
+    unsigned int pop_size = 5;
+    unsigned int archive_size = 2;
     float p_cross = 0.9;
 
     std::vector <solution> pop, archive;
