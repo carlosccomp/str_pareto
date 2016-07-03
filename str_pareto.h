@@ -10,13 +10,13 @@ private:
     int problem_size = 1;
     double search_space_min = -10;
     double search_space_max = 10;
-    int max_gens = 200;
-    unsigned int pop_size = 100;
-    unsigned int archive_size = 30;
+    int max_gens = 10;
+    unsigned int pop_size = 10;
+    unsigned int archive_size = 3;
     float p_cross = 0.9;
 
-    unsigned int n_params = 1;
-    precision bitsize = HIGH_PRECISION;
+    unsigned int n_params = 2;
+    precision bitsize = STD_PRECISION;
 
     std::vector <solution> pop, archive;
 public:

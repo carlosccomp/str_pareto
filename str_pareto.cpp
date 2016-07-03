@@ -14,7 +14,9 @@ void str_pareto::calculate_objectives() {
         it->decodeObjective(1, search_space_min, search_space_max, [](double x) { return (x-2) * (x-2); });*/
 
         it->setNumObjectives(1);
-        it->decodeObjective(0, search_space_min, search_space_max, [](std::vector <double> &vals) { return vals[0] * vals[0]; });
+        //it->decodeObjective(0, search_space_min, search_space_max, [](std::vector <double> &vals) { return vals[0] * vals[0]; });
+        it->decodeObjective(0, search_space_min, search_space_max,
+                            [](std::vector <double> &x) { return 0.26 * (x[0] * x[0] + x[1] * x[1]) - 0.48 * x[0] * x[1]; });
     }
 }
 
@@ -157,9 +159,9 @@ void str_pareto::run() {
 
         std::cout << i << " => " << archive[0] << std::endl;
 
-        /*for(auto it=archive.begin();it!=archive.end();it++)
+        for(auto it=pop.begin();it!=pop.end();it++)
             std::cout << *it << std::endl;
-        std::cout << std::endl << std::endl;*/
+        std::cout << std::endl << std::endl;
 
         if(i >= max_gens) break;
 

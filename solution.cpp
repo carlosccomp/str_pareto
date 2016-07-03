@@ -145,7 +145,7 @@ bool solution::dominates(solution &s2) {
 
 void solution::crossoverAndMutate(solution &s2, solution *result, float p_cross) {
     result->init(data.size(), static_cast<precision>(data[0].size()));
-    double r = (static_cast<double>(rand()) / (RAND_MAX)), m_rate = 1/data.size();
+    double r = (static_cast<double>(rand()) / (RAND_MAX)), m_rate = 1/(data.size() * data[0].size());
     if(r > p_cross)
         result->data = data;
     else {
@@ -167,13 +167,14 @@ void solution::crossoverAndMutate(solution &s2, solution *result, float p_cross)
 }
 
 bool solution::operator ==(solution &s2) {
-    if(data.size() != s2.data.size())
+    if(data.size() != s2.data.size() || data[0].size() != s2.data[0].size())
         return false;
 
-    unsigned int i;
-    for(i=0;i<data.size();i++)
-        if(data[i] != s2.data[i])
-            return false;
+    unsigned int p, i;
+    for(p=0;p<data.size();p++)
+        for(i=0;i<data[p].size();i++)
+            if(data[p][i] != s2.data[p][i])
+                return false;
 
     return true;
 }
