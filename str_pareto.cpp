@@ -1,6 +1,7 @@
 #include "str_pareto.h"
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <vector>
 #include <c++/cmath>
@@ -13,8 +14,8 @@ void str_pareto::calculate_objectives() {
         it->decodeObjective(0, search_space_min, search_space_max, [](double x) { return x * x; });
         it->decodeObjective(1, search_space_min, search_space_max, [](double x) { return (x-2) * (x-2); });*/
 
+        // Matyas function
         it->setNumObjectives(1);
-        //it->decodeObjective(0, search_space_min, search_space_max, [](std::vector <double> &vals) { return vals[0] * vals[0]; });
         it->decodeObjective(0, search_space_min, search_space_max,
                             [](std::vector <double> &x) { return 0.26 * (x[0] * x[0] + x[1] * x[1]) - 0.48 * x[0] * x[1]; });
     }
@@ -128,7 +129,19 @@ void str_pareto::reproduce() {
     std::vector <solution> children;
     children.reserve(pop_size + 1);
 
-    while(children.size() < pop_size) {
+    /*while(children.size() < pop_size) {
+        int parent1 = rand() % pop_size, parent2 = rand() % pop_size;
+        while(parent2 == parent1)
+            parent2 = rand() % pop_size;
+
+        solution s_children;
+        pop[parent1].crossoverAndMutate(pop[parent2], &s_children, p_cross);
+        children.push_back(s_children);
+        pop[parent2].crossoverAndMutate(pop[parent1], &s_children, p_cross);
+        children.push_back(s_children);
+    }*/
+
+    while(children.size() < archive_size) {
         int parent1 = rand() % archive_size, parent2 = rand() % archive_size;
         while(parent2 == parent1)
             parent2 = rand() % archive_size;
@@ -144,7 +157,7 @@ void str_pareto::reproduce() {
     pop = children;
 }
 
-void str_pareto::run() {
+void str_pareto::run(std::fstream &out) {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
     std::cerr.tie(nullptr);
@@ -159,13 +172,14 @@ void str_pareto::run() {
         environmental_selection();
         std::sort(archive.begin(), archive.end(), [](solution &s1, solution &s2){ return s1 < s2; });
 
-        std::cout << i << " => " << archive[0] << std::endl;
+        //std::cout << i << " => " << archive[0] << std::endl;
 
-        for(auto it=archive.begin();it!=archive.end();it++)
-            std::cout << *it << std::endl;
-        std::cout << std::endl << std::endl;
-
-        if(i >= max_gens) break;
+        if(i >= max_gens) {
+            out << archive[0].decode(0, search_space_min, search_space_max) << ' '
+                << archive[0].decode(1, search_space_min, search_space_max) << ' '
+                << archive[0].getObjective(0) << ';' << std::endl;
+            break;
+        }
 
         reproduce();
         i++;

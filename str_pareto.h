@@ -2,6 +2,7 @@
 #define STR_PARETO_STR_PARETO_H
 
 #include <vector>
+#include <fstream>
 
 #include "solution.h"
 
@@ -10,10 +11,10 @@ private:
     int problem_size = 1;
     double search_space_min = -10;
     double search_space_max = 10;
-    int max_gens = 10;
-    unsigned int pop_size = 10;
-    unsigned int archive_size = 3;
-    float p_cross = 0.99;
+    int max_gens = 500;
+    unsigned int pop_size = 200;
+    unsigned int archive_size = 50;
+    float p_cross = 0.9;
 
     unsigned int n_params = 2;
     precision bitsize = STD_PRECISION;
@@ -28,7 +29,7 @@ public:
     void environmental_selection();
     void reproduce();
 
-    void run();
+    void run(std::fstream &out);
 };
 
 #endif
