@@ -90,6 +90,8 @@ void str_pareto::environmental_selection() {
         union_.push_back(&(*it));
 
     std::sort(union_.begin(), union_.end(), [](solution *s1, solution *s2){ return (*s1).getFitness() < (*s2).getFitness(); });
+    auto uit = std::unique(union_.begin(), union_.end(), [](solution *s1, solution *s2) { return *s1 == *s2; });
+    union_.resize(std::distance(union_.begin(), uit));
 
     auto it = union_.begin();
     for(;it!=union_.end();it++) {
@@ -159,7 +161,7 @@ void str_pareto::run() {
 
         std::cout << i << " => " << archive[0] << std::endl;
 
-        for(auto it=pop.begin();it!=pop.end();it++)
+        for(auto it=archive.begin();it!=archive.end();it++)
             std::cout << *it << std::endl;
         std::cout << std::endl << std::endl;
 

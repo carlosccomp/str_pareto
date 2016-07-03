@@ -145,7 +145,7 @@ bool solution::dominates(solution &s2) {
 
 void solution::crossoverAndMutate(solution &s2, solution *result, float p_cross) {
     result->init(data.size(), static_cast<precision>(data[0].size()));
-    double r = (static_cast<double>(rand()) / (RAND_MAX)), m_rate = 1/(data.size() * data[0].size());
+    double r = (static_cast<double>(rand()) / (RAND_MAX)), m_rate = 1/10;
     if(r > p_cross)
         result->data = data;
     else {

@@ -13,7 +13,7 @@ private:
     int max_gens = 10;
     unsigned int pop_size = 10;
     unsigned int archive_size = 3;
-    float p_cross = 0.9;
+    float p_cross = 0.99;
 
     unsigned int n_params = 2;
     precision bitsize = STD_PRECISION;
