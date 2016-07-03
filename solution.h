@@ -16,13 +16,15 @@ enum precision {
 
 class solution {
 private:
-    std::vector<bool> data;
+    std::vector<std::vector<bool>> data;
     double _raw_fitness, _density, _fitness;
     std::vector <double> objectives;
     std::set <int> _dominates;
 public:
-    solution(precision p = STD_PRECISION);
-    double decode(double min, double max);
+    solution() = default;
+    solution(unsigned int n_params, precision p = STD_PRECISION);
+    void init(unsigned int n_params, precision p = STD_PRECISION);
+    double decode(int index, double min, double max);
 
     void setRawFitness(double raw_fitness);
     void setDensity(double density);
@@ -34,7 +36,7 @@ public:
     void clearObjectives();
     void setNumObjectives(unsigned int n);
     void setObjective(int index, double value);
-    void decodeObjective(int index, double min, double max, const std::function<double(double)> &f);
+    void decodeObjective(int index, double min, double max, const std::function<double(std::vector<double> &)> &f);
     int getNumObjectives();
     double getObjective(int index);
 

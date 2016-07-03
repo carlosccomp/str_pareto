@@ -5,18 +5,25 @@
 #include <c++/cmath>
 #include <functional>
 
-solution::solution(precision p) {
-    unsigned int bitsize = static_cast<unsigned int>(p);
-    data.resize(bitsize);
-
-    for(unsigned int i=0;i<bitsize;i++)
-        data[i] = (rand() % 2 == 1);
+solution::solution(unsigned int n_params, precision p) {
+    init(n_params, p);
 }
 
-double solution::decode(double min, double max) {
+void solution::init(unsigned int n_params, precision p) {
+    unsigned int bitsize = static_cast<unsigned int>(p);
+    data.resize(n_params);
+
+    for(auto it=data.begin();it!=data.end();it++) {
+        it->resize(bitsize);
+        for(unsigned int i=0;i<bitsize;i++)
+            (*it)[i] = (rand() % 2 == 1);
+    }
+}
+
+double solution::decode(int index, double min, double max) {
     double value = min, step = max - min;
 
-    switch(data.size()) {
+    switch(data[index].size()) {
         case 64:
             step /= 65536;
             step /= 65536;
@@ -33,14 +40,14 @@ double solution::decode(double min, double max) {
     }
 
     unsigned int i;
-    for(i=0;i<16&&i<data.size();i++)
-        if(data[i]) value += step * (1 << i);
-    for(i=16;i<32&&i<data.size();i++)
-        if(data[i]) value += step * (1 << (i - 16)) * (1 << 16);
-    for(i=32;i<48&&i<data.size();i++)
-        if(data[i]) value += step * (1 << (i - 32)) * (1 << 16) * (1 << 16);
-    for(i=48;i<64&&i<data.size();i++)
-        if(data[i]) value += step * (1 << (i - 48)) * (1 << 16) * (1 << 16) * (1 << 16);
+    for(i=0;i<16&&i<data[index].size();i++)
+        if(data[index][i]) value += step * (1 << i);
+    for(i=16;i<32&&i<data[index].size();i++)
+        if(data[index][i]) value += step * (1 << (i - 16)) * (1 << 16);
+    for(i=32;i<48&&i<data[index].size();i++)
+        if(data[index][i]) value += step * (1 << (i - 32)) * (1 << 16) * (1 << 16);
+    for(i=48;i<64&&i<data[index].size();i++)
+        if(data[index][i]) value += step * (1 << (i - 48)) * (1 << 16) * (1 << 16) * (1 << 16);
 
     return value;
 }
@@ -82,8 +89,13 @@ void solution::setObjective(int index, double value) {
     objectives[index] = value;
 }
 
-void solution::decodeObjective(int index, double min, double max, const std::function<double(double)> &f) {
-    objectives[index] = f(decode(min, max));
+void solution::decodeObjective(int index, double min, double max, const std::function<double(std::vector<double> &)> &f) {
+    std::vector <double> values;
+    unsigned int i;
+    for(i=0;i<data.size();i++)
+        values.push_back(decode(i, min, max));
+
+    objectives[index] = f(values);
 }
 
 int solution::getNumObjectives() {
@@ -132,21 +144,24 @@ bool solution::dominates(solution &s2) {
 }
 
 void solution::crossoverAndMutate(solution &s2, solution *result, float p_cross) {
+    result->init(data.size(), static_cast<precision>(data[0].size()));
     double r = (static_cast<double>(rand()) / (RAND_MAX)), m_rate = 1/data.size();
     if(r > p_cross)
         result->data = data;
     else {
-        unsigned int i;
+        unsigned int i, p;
         result->data.resize(data.size());
-        for(i=0;i<data.size();i++) {
-            // crossover
-            r = (static_cast<double>(rand()) / (RAND_MAX));
-            result->data[i] = (r < 0.5)?data[i]:s2.data[i];
+        for(p=0;p<data.size();p++) {
+            for(i=0;i<data[p].size();i++) {
+                // crossover
+                r = (static_cast<double>(rand()) / (RAND_MAX));
+                result->data[p][i] = (r < 0.5)?data[p][i]:s2.data[p][i];
 
-            // mutate
-            r = (static_cast<double>(rand()) / (RAND_MAX));
-            if(r < m_rate)
-                result->data[i] = !result->data[i];
+                // mutate
+                r = (static_cast<double>(rand()) / (RAND_MAX));
+                if(r < m_rate)
+                    result->data[p][i] = !result->data[p][i];
+            }
         }
     }
 }
@@ -180,11 +195,15 @@ bool solution::operator <(solution &s2) {
 
 std::ostream &operator <<(std::ostream &os, solution &s) {
     os << '[';
-    for(auto it=s.data.rbegin();it!=s.data.rend();it++)
-        os << (*it?'1':'0');
+    for(auto it=s.data.begin();it!=s.data.end();it++) {
+        for(auto it2=it->rbegin();it2!=it->rend();it2++)
+            os << (*it2?'1':'0');
+        os << "; ";
+    }
     os << "] (" << *(s.objectives.begin());
     for(auto it=s.objectives.begin() + 1;it!=s.objectives.end();it++)
         os << ", " << *it;
-    os << ") => { raw_fitness: " << s._raw_fitness << ", density: " << s._density << ", fitness: " << s._fitness << " }";
+    os << ")" << std::endl << "\t=> { raw_fitness: " << s._raw_fitness
+        << ", density: " << s._density << ", fitness: " << s._fitness << " }";
     return os;
 }

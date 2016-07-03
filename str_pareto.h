@@ -15,6 +15,9 @@ private:
     unsigned int archive_size = 30;
     float p_cross = 0.9;
 
+    unsigned int n_params = 1;
+    precision bitsize = HIGH_PRECISION;
+
     std::vector <solution> pop, archive;
 public:
     void calculate_objectives();

@@ -2,15 +2,19 @@
 
 #include <iostream>
 #include <algorithm>
+#include <vector>
 #include <c++/cmath>
 #include <cstdlib>
 
 void str_pareto::calculate_objectives() {
     for(auto it=pop.begin();it!=pop.end();it++) {
         it->clearObjectives();
-        it->setNumObjectives(2);
+        /*it->setNumObjectives(2);
         it->decodeObjective(0, search_space_min, search_space_max, [](double x) { return x * x; });
-        it->decodeObjective(1, search_space_min, search_space_max, [](double x) { return (x-2) * (x-2); });
+        it->decodeObjective(1, search_space_min, search_space_max, [](double x) { return (x-2) * (x-2); });*/
+
+        it->setNumObjectives(1);
+        it->decodeObjective(0, search_space_min, search_space_max, [](std::vector <double> &vals) { return vals[0] * vals[0]; });
     }
 }
 
@@ -142,6 +146,8 @@ void str_pareto::run() {
     std::cerr.tie(nullptr);
 
     pop.resize(pop_size);
+    for(auto it=pop.begin();it!=pop.end();it++)
+        it->init(n_params, bitsize);
 
     int i = 0;
     while(true) {
@@ -150,6 +156,10 @@ void str_pareto::run() {
         std::sort(archive.begin(), archive.end(), [](solution &s1, solution &s2){ return s1 < s2; });
 
         std::cout << i << " => " << archive[0] << std::endl;
+
+        /*for(auto it=archive.begin();it!=archive.end();it++)
+            std::cout << *it << std::endl;
+        std::cout << std::endl << std::endl;*/
 
         if(i >= max_gens) break;
 
