@@ -86,23 +86,33 @@ void str_pareto::environmental_selection() {
 
     auto it = union_.begin();
     for(;it!=union_.end();it++) {
-        if((*it)->getFitness() >= 1.0f)
-            break;
+        if((*it)->getFitness() < 1.0f)
+            environment.push_back(*it);
     }
 
-    for(auto a=union_.begin();a!=union_.end();a++)
-        std::cout << *(*a) << std::endl;
-
-    /*if(it - union_.begin() <= archive_size) {
-        // FALHA DE SEGMENTAÇÃO AQUI
-        environment.insert(union_.begin(), union_.begin() + archive_size, environment.end());
+    if(environment.size() < archive_size) {
+        unsigned int i;
+        for(i=environment.size();i<archive_size;i++)
+            environment.push_back(union_[i]);
     }
     else {
-
+        while(environment.size() > archive_size) {
+            std::vector <double> densities;
+            densities.resize(environment.size());
+            for(auto it2=environment.begin();it2!=environment.end();it2++)
+                densities[it2 - environment.begin()] = calculate_density(*(*it2), environment);
+            auto max_ = std::max_element(densities.begin(), densities.end());
+            environment.erase(environment.begin() + (max_ - densities.begin()));
+        }
     }
 
-    for(auto a=environment.begin();a!=environment.end();a++)
-        std::cout << *(*a) << std::endl;*/
+    std::vector <solution> archive_aux;
+    for(auto it2=environment.begin();it2!=environment.end();it2++)
+        archive_aux.push_back(*(*it2));
+    archive.clear();
+    archive.reserve(archive_size);
+    for(auto it2=archive_aux.begin();it2!=archive_aux.end();it2++)
+        archive.push_back(*it2);
 }
 
 void str_pareto::run() {
@@ -112,16 +122,18 @@ void str_pareto::run() {
 
     pop.resize(pop_size);
 
-    //int i = 0;
-    //while(true) {
+    int i = 0;
+    while(true) {
         calculate_fitness();
         environmental_selection();
-        // TODO sorting
+        std::sort(archive.begin(), archive.end(), [](solution &s1, solution &s2){ return s1 < s2; });
 
-        //if(i >= max_gens) break;
+        std::cout << i << " => " << archive[0] << std::endl;
+
+        if(i >= max_gens) break;
 
         // TODO tournament
         // TODO reproduce
-        //i++;
-    //}
+        i++;
+    }
 }

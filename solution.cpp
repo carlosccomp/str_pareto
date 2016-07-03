@@ -165,8 +165,6 @@ std::ostream &operator <<(std::ostream &os, solution &s) {
     os << "] (" << *(s.objectives.begin());
     for(auto it=s.objectives.begin() + 1;it!=s.objectives.end();it++)
         os << ", " << *it;
-    os << ") => { raw_fitness: " << s._raw_fitness << ", density: " << s._density << ", fitness: " << s._fitness << " }; dominates ";
-    for(auto it=s._dominates.begin();it!=s._dominates.end();it++)
-        os << *it << ' ';
+    os << ") => { raw_fitness: " << s._raw_fitness << ", density: " << s._density << ", fitness: " << s._fitness << " }";
     return os;
 }
