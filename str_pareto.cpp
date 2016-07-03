@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <c++/cmath>
+#include <cstdlib>
 
 void str_pareto::calculate_objectives() {
     for(auto it=pop.begin();it!=pop.end();it++) {
@@ -115,6 +116,26 @@ void str_pareto::environmental_selection() {
         archive.push_back(*it2);
 }
 
+void str_pareto::reproduce() {
+    std::vector <solution> children;
+    children.reserve(pop_size + 1);
+
+    while(children.size() < pop_size) {
+        int parent1 = rand() % archive_size, parent2 = rand() % archive_size;
+        while(parent2 == parent1)
+            parent2 = rand() % archive_size;
+
+        solution s_children;
+        archive[parent1].crossoverAndMutate(archive[parent2], &s_children, p_cross);
+        children.push_back(s_children);
+        archive[parent2].crossoverAndMutate(archive[parent1], &s_children, p_cross);
+        children.push_back(s_children);
+    }
+
+    pop.clear();
+    pop = children;
+}
+
 void str_pareto::run() {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
@@ -132,8 +153,7 @@ void str_pareto::run() {
 
         if(i >= max_gens) break;
 
-        // TODO tournament
-        // TODO reproduce
+        reproduce();
         i++;
     }
 }

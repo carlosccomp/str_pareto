@@ -131,6 +131,26 @@ bool solution::dominates(solution &s2) {
     return true;
 }
 
+void solution::crossoverAndMutate(solution &s2, solution *result, float p_cross) {
+    double r = (static_cast<double>(rand()) / (RAND_MAX)), m_rate = 1/data.size();
+    if(r > p_cross)
+        result->data = data;
+    else {
+        unsigned int i;
+        result->data.resize(data.size());
+        for(i=0;i<data.size();i++) {
+            // crossover
+            r = (static_cast<double>(rand()) / (RAND_MAX));
+            result->data[i] = (r < 0.5)?data[i]:s2.data[i];
+
+            // mutate
+            r = (static_cast<double>(rand()) / (RAND_MAX));
+            if(r < m_rate)
+                result->data[i] = !result->data[i];
+        }
+    }
+}
+
 bool solution::operator ==(solution &s2) {
     if(data.size() != s2.data.size())
         return false;

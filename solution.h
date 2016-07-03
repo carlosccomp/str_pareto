@@ -46,6 +46,8 @@ public:
 
     bool dominates(solution &s2);
 
+    void crossoverAndMutate(solution &s2, solution *result, float p_cross);
+
     bool operator ==(solution &s2);
     bool operator <(solution &s2);
     friend std::ostream &operator <<(std::ostream &os, solution &s);

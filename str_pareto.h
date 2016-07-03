@@ -10,9 +10,9 @@ private:
     int problem_size = 1;
     double search_space_min = -10;
     double search_space_max = 10;
-    int max_gens = 50;
-    unsigned int pop_size = 50;
-    unsigned int archive_size = 5;
+    int max_gens = 200;
+    unsigned int pop_size = 100;
+    unsigned int archive_size = 30;
     float p_cross = 0.9;
 
     std::vector <solution> pop, archive;
@@ -23,6 +23,7 @@ public:
     double calculate_density(solution &s, std::vector <solution *> &pop_);
     void calculate_fitness();
     void environmental_selection();
+    void reproduce();
 
     void run();
 };
